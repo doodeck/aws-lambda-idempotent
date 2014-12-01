@@ -70,7 +70,7 @@ Now open Lambda (Preview) in the AWS console. Edit/Test the function you created
 ```
 Click "Save and invoke"
 
-The function should start calling itself recursively every 5 seconds. The DynamoDB record should get incremented in the process. Also, there are corresponding logs written to the Amazon CloudTrail. Do not be confused, the Lambda console will only show the first invocation of the function, the subsequent recursive calls are happening in the background, leaving the trails in the CloudTrail and incrementing the DynamoDB record.
+The function should start calling itself recursively every 5 seconds. The DynamoDB record should get incremented in the process. Also, there are corresponding logs written to the Amazon CloudWatch. Do not be confused, the Lambda console will only show the first invocation of the function, the subsequent recursive calls are happening in the background, leaving the trails in the CloudWatch and incrementing the DynamoDB record.
 
 If you want to terminate the function you can carry out any of these operations:
 
