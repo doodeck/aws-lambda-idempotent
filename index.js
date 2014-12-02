@@ -68,7 +68,7 @@ var lambdaIdempotent = function(params, callback) {
             }
         },
         TableName: config.idmptTableName,
-        ConsistentRead: false, // bet subsequent conditional update is good enough
+        ConsistentRead: true, // if I do getItem it definitely must be true, but I thing I should only be doing conditional updateItem()
     }, function(err, data) {
       if (!!err) {
         console.log('Error: ', err || {}, err.stack || {}); // an error occurred
