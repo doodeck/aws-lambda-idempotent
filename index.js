@@ -58,72 +58,44 @@ var dynamodb = new AWS.DynamoDB({});
 // lambdaIdempotent.js
 // idempotent replacement of AWS.Lambda().invokeAsync()
 var lambdaIdempotent = function(params, callback) {
-    dynamodb.getItem({
-        Key: { /* required */
-            FunctionName: {
-                S: config.functionName
+    try {
+        dynamodb.updateItem({
+            Key: { /* required */
+                FunctionName: {
+                    S: config.functionName
+                },
+                InstanceId: {
+                    S: params.InstanceId
+                }
             },
-            InstanceId: {
-                S: params.InstanceId
+            TableName: config.idmptTableName,
+            ConditionExpression: 'Seq = :es',
+            UpdateExpression: 'SET Seq = Seq + :one',
+            ExpressionAttributeValues: {
+                ":es" : { N: params.ExpectedSeq.toString() },
+                ":one" : { N: "1" }
+            } // data.Item.Seq.N }}
+        }, function(err, data) {
+            if (err) {
+                console.log(err, err.stack); // an error occurred
+                callback(err, {});
+            } else {
+                var invokeSyncParams = {
+                  FunctionName: config.functionName,
+                  InvokeArgs: JSON.stringify({
+                      InstanceId: params.InstanceId,
+                      ExpectedSeq: params.ExpectedSeq + 1
+                  })
+                };
+                console.log('Next gen: ', invokeSyncParams);           // successful response
+                // params.ExpectedSeq++;
+                lambda.invokeAsync(invokeSyncParams, callback);
             }
-        },
-        TableName: config.idmptTableName,
-        ConsistentRead: true, // if I do getItem it definitely must be true, but I thing I should only be doing conditional updateItem()
-    }, function(err, data) {
-      if (!!err) {
-        console.log('Error: ', err || {}, err.stack || {}); // an error occurred
-        callback(err, data);
-      } else if (!data || !data.Item) {
-        console.log('No data: ', data || {}); // an error occurred
-        callback(err, data);
-      } else {
-        console.log(data);           // successful response
-        if (data.Item.Seq.N.toString() !== params.ExpectedSeq.toString()) {
-            var _err = 'DB (' + JSON.stringify(data.Item.Seq.N) + ') vs. ExpectedSeq ' + JSON.stringify(params.ExpectedSeq) + ' mismatch, lambda not invoked';
-            console.log(_err);
-            callback(_err, {});
-        } else {
-            try {
-                dynamodb.updateItem({
-                    Key: { /* required */
-                        FunctionName: {
-                            S: config.functionName
-                        },
-                        InstanceId: {
-                            S: params.InstanceId
-                        }
-                    },
-                    TableName: config.idmptTableName,
-                    ConditionExpression: 'Seq = :es',
-                    UpdateExpression: 'SET Seq = Seq + :one',
-                    ExpressionAttributeValues: {
-                        ":es" : { N: params.ExpectedSeq.toString() },
-                        ":one" : { N: "1" }
-                    } // data.Item.Seq.N }}
-                }, function(err, data) {
-                    if (err) {
-                        console.log(err, err.stack); // an error occurred
-                        callback(_err, {});
-                    } else {
-                        var invokeSyncParams = {
-                          FunctionName: config.functionName,
-                          InvokeArgs: JSON.stringify({
-                              InstanceId: params.InstanceId,
-                              ExpectedSeq: params.ExpectedSeq + 1
-                          })
-                        };
-                        console.log(data);           // successful response
-                        // params.ExpectedSeq++;
-                        lambda.invokeAsync(invokeSyncParams, callback);
-                    }
-                });
-            } catch(e) {
-                console.log('updateItem exception: ', e);
-                callback(e, {});
-            }
-        }
-      }
-    });
+        });
+    } catch(e) {
+        console.log('updateItem exception: ', e);
+        callback(e, {});
+    }
 };
 
 // invokeIdempotent.js
@@ -145,6 +117,7 @@ exports.invokeIdempotent = function(event, context) {
       // InvokeArgs: '{}'
     };
 
+    console.log('On entry: ', params);
     /*lambda.invokeAsync(params, function(err, data) {*/
     lambdaIdempotent(params, function(err, data) {
       if (err) {
