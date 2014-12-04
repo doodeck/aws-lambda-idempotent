@@ -6,7 +6,7 @@ var config = {
     region: 'eu-west-1',
     idmptTableName: 'LambdaLocks',
     timeout: 5000,
-    restartInterval: 100, // after how many invocations should the restart be forced
+    restartInterval: 999999999, // 100, // after how many invocations should the restart be forced
     lambdaTimeout: 16 // default value of the handler
 };
 
