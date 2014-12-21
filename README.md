@@ -18,7 +18,7 @@ Using the AWS Console create a new HelloWorld project following that tutorial, y
 
 http://docs.aws.amazon.com/lambda/latest/dg/getting-started.html
 
-Set memory to 128MB, execution time to 7 seconds.
+Set memory to 128MB, execution time to 16 seconds.
 
 Follow only the 2 tutorials using AWS Console, i.e. Getting Started 1 & 2, you don't need to continue to CLI.
 
