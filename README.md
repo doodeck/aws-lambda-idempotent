@@ -18,7 +18,7 @@ Using the AWS Console create a new HelloWorld project following that tutorial, y
 
 http://docs.aws.amazon.com/lambda/latest/dg/getting-started.html
 
-Set memory to 128MB, execution time to 16 seconds.
+Set memory to 128MB, execution time to 16 seconds. Set the handler name to "invokeIdempotent" (without quotes).
 
 Follow only the 2 tutorials using AWS Console, i.e. Getting Started 1 & 2, you don't need to continue to CLI.
 
@@ -44,7 +44,7 @@ Edit the default execution role (lambda_exec_role) to add DynamoDB and Lambda ac
 }
 ```
 
-Create the DynamoDB table with Primary Hash Key called "FunctionName", of type String, and Primary Range Key called "InstanceId", also String. You can find the complete JSON dump of such a table in the index.js. Add a single item to that table:
+Create the DynamoDB table with Table Name "LambdaLocks", Primary Hash Key called "FunctionName", of type String, and Primary Range Key called "InstanceId", also String. You can find the complete JSON dump of such a table in the index.js. Add a single item to that table:
 
 ```json
 {
