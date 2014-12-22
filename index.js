@@ -5,9 +5,12 @@ var config = {
     functionName: 'invokeIdempotent',
     region: 'eu-west-1',
     idmptTableName: 'LambdaLocks',
-    timeout: 5000,
-    restartInterval: 100, // after how many invocations should the restart be forced
-    lambdaTimeout: 16 // default value of the handler
+    timeout: 4000, // timeout before function is invoked and content really executed
+    timeoutDev: 2000, // random deviation from the timeout (to eliminate multiple instances accidentally running in parallel)
+    restartInterval: 200, // after how many invocations should the restart be forced
+    lambdaTimeout: 16, // default value of the handler
+    acceptRange: 2 // range of accepted values in DynamoDB, in other words: retry count,
+                   // should help in case Dynamo is updated but then the function freezes and the framework starts it again
 };
 
 // createTable.js
@@ -61,7 +64,7 @@ var dynamodb = new AWS.DynamoDB({});
 // idempotent replacement of AWS.Lambda().invokeAsync()
 var lambdaIdempotent = function(params, callback) {
     try {
-        dynamodb.updateItem({
+        var item = {
             Key: { /* required */
                 FunctionName: {
                     S: config.functionName
@@ -71,14 +74,17 @@ var lambdaIdempotent = function(params, callback) {
                 }
             },
             TableName: config.idmptTableName,
-            ConditionExpression: 'Seq = :es',
-            UpdateExpression: 'SET Seq = Seq + :one, InvokeId = :invid',
+            ConditionExpression: 'Seq >= :es AND Seq < :rend',
+            UpdateExpression: 'SET Seq = :es + :one, InvokeId = :invid',
             ExpressionAttributeValues: {
                 ":es" : { N: params.ExpectedSeq.toString() },
                 ":one" : { N: "1" },
-                ":invid" : { S: params.InvokeId }
+                ":invid" : { S: params.InvokeId },
+                ":rend" : { N: (params.ExpectedSeq + config.acceptRange).toString() }
             } // data.Item.Seq.N }}
-        }, function(err, data) {
+        };
+        console.log('update item: ', item);
+        dynamodb.updateItem(item, function(err, data) {
             if (err) {
                 console.log(err, err.stack); // an error occurred
                 callback(err, {});
@@ -146,6 +152,8 @@ var vanillaTest;
 */
 exports.invokeIdempotent = function(event, context) {
   // vanillaTest(event,context);
+  var randomizedTimeout = Math.floor((Math.random() * config.timeoutDev) + config.timeout);
+  console.log('Using timeout: ', randomizedTimeout);
   setTimeout(function() {
     var params = {
       // FunctionName: config.functionName,
@@ -168,7 +176,7 @@ exports.invokeIdempotent = function(event, context) {
         else
             context.done(null, 'Exiting InstanceId: ' + event.InstanceId + ', ExpectedSeq: ' + event.ExpectedSeq.toString());  // SUCCESS with message
     });
-  }, config.timeout);
+  }, randomizedTimeout);
 };
 
 vanillaTest = function(event,context) {
