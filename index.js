@@ -72,10 +72,11 @@ var lambdaIdempotent = function(params, callback) {
             },
             TableName: config.idmptTableName,
             ConditionExpression: 'Seq = :es',
-            UpdateExpression: 'SET Seq = Seq + :one',
+            UpdateExpression: 'SET Seq = Seq + :one, InvokeId = :invid',
             ExpressionAttributeValues: {
                 ":es" : { N: params.ExpectedSeq.toString() },
-                ":one" : { N: "1" }
+                ":one" : { N: "1" },
+                ":invid" : { S: params.InvokeId }
             } // data.Item.Seq.N }}
         }, function(err, data) {
             if (err) {
@@ -150,6 +151,7 @@ exports.invokeIdempotent = function(event, context) {
       // FunctionName: config.functionName,
       InstanceId: event.InstanceId, // multiple instances of the same function can be running simultaneously in different groups
       ExpectedSeq: event.ExpectedSeq, // Seq value currently in the database. If function is unable to retrieve and increment that value the lamdba recursive invocation will not take place
+      InvokeId: context.invokeid
       // InvokeArgs: '{}'
     };
 
