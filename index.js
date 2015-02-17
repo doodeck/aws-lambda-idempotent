@@ -1,3 +1,8 @@
+//
+// This is no longer used. All the content has been copy/pasted to
+// the project in invokeidempotent subfolder
+//
+
 console.log('Loading event');
 
 // config.js
