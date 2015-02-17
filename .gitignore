@@ -29,3 +29,4 @@ node_modules
 
 # sublime text
 *.sublime-*
+tmp
