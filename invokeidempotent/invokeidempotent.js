@@ -2,6 +2,8 @@
 
 'use strict';
 
+console.log('Loading event');
+
 var config = require('./config').config;
 // lambdaIdempotent.js
 var AWS = require('aws-sdk');

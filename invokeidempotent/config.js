@@ -3,7 +3,7 @@
 'use strict';
 
 exports.config = {
-    functionName: 'invokeIdempotent',
+    functionName: 'invokeidempotent',
     region: 'eu-west-1',
     idmptTableName: 'LambdaLocks',
     timeout: 4000, // timeout before function is invoked and content really executed
