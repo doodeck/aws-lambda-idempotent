@@ -75,7 +75,7 @@ The function should start calling itself recursively every 5 seconds. The Dynamo
 If you want to terminate the function you can carry out any of these operations:
 
 <ul>
-  <li>In the Lambda consle change the advanced settings of the function, change the timeout to 1 second, the next invocation with be prematurely interrupted, or</li>
+  <li>In the Lambda console change the advanced settings of the function, change the timeout to 1 second, the next invocation with be prematurely interrupted, or</li>
   <li>In the DynamoDB console edit the reord and modify the Seq field to break the incremental sequence</li>
-  <li>... or the brute force approach of deleteing the Lambda function.</li>
+  <li>... or the brute force approach of deleting the Lambda function.</li>
 </ul>
