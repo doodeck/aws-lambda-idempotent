@@ -18,10 +18,10 @@ Use cases
 ---------
 Imaginable applications include e.g.
 
-* multiple scaling of the images,
-* installing bots in the cloud, performing operations at regular intervals, e.g.
-..* scraping the content off the web, putting it into databases
-..* status reporting to Twitter, Facebook, etc.
+1. multiple scaling of the images,
+2. installing bots in the cloud, performing operations at regular intervals, e.g.
+..+ scraping the content off the web, putting it into databases
+..+ status reporting to Twitter, Facebook, etc.
 
 
 Getting Started
