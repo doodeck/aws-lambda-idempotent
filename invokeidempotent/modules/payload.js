@@ -1,9 +1,11 @@
 // payload.js
 
 exports.handler = function() {
-  console.log('payload: ', new Date().toString());
+  var startingMoment = +new Date();
+  console.log('payload: ', new Date(startingMoment).toString());
   var index = 0;
   setInterval(function() {
-    console.log('index: ', index++);
-  }, (3 * 100));
+    var delta = +new Date() - startingMoment;
+    console.log('index: ', index++, new Date(delta).toString());
+  }, (10 * 100));
 }
