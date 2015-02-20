@@ -1,15 +1,28 @@
 aws-lambda-idempotent
 =====================
 
-Library to call AWS Lambda functions preventing duplicate execution
+An Internet daemon running tirelessly in the cloud doing any useful work of you choice.
 
-A somewhat controversial, albeit absolutely legitimate use case for AWS Lambda functions is recursion.
+The library is calling AWS Lambda functions preventing duplicate execution.
 
-Imaginable applications include e.g. multiple scaling of the images or installing bots in the cloud, performing operations at regular intervals.
+The reasoning
+-------------
 
-In either case, since Lambda fuctions are so perfectly cloud resident and detached from the physical world, it's possible that you lose track of what is running in the background. As a result of mistaken invocation or some bug in the recursive code, you may end up with hundreds of lambda functions sucking the precious second-GBs from you free tier and later from your CC.
+A somewhat controversial, albeit absolutely legitimate use case for AWS Lambda functions is recursion. It's very important to prevent multiple deamon instances spinning out of control though.
+
+Lambda fuctions are so perfectly cloud resident and detached from the physical world, it's possible that you lose track of what is running in the background. As a result of mistaken invocation or some bug in the recursive code, you may end up with tens of lambda functions sucking the precious second-GBs from you free tier and later from your credit card.
 
 The library is preventing that using the DynamoDB. A recursive Lambda fuction is called an instance. There can be only one instance running at the same time, The accompanying DynamoDB record is keeping track of that by conditionally incrementing a singleton counter. Should a function be executed mistakenly, it will not be able to increment the record and will terminate without spinning off a recursive descendant.
+
+Use cases
+---------
+Imaginable applications include e.g.
+
+* multiple scaling of the images,
+* installing bots in the cloud, performing operations at regular intervals, e.g.
+..* scraping the content off the web, putting it into databases
+..* status reporting to Twitter, Facebook, etc.
+
 
 Getting Started
 ---------------
@@ -79,3 +92,8 @@ If you want to terminate the function you can carry out any of these operations:
   <li>In the DynamoDB console edit the reord and modify the Seq field to break the incremental sequence</li>
   <li>... or the brute force approach of deleting the Lambda function.</li>
 </ul>
+
+The Payload
+-----------
+You can hook any useful content in the modules/payload.js folder. Intertingly, the payload function can work after the Lambda invocation has officially finished by calling context.done(). You are billed only for the execution until context.done(), after that the payload function keeps running much longer, even 15 minutes. You can test it with the sample payload, which is an infinite loop running for as long as possible.
+
