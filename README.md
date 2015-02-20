@@ -10,7 +10,7 @@ The reasoning
 
 A somewhat controversial, albeit absolutely legitimate use case for AWS Lambda functions is recursion. It's very important to prevent multiple deamon instances spinning out of control though.
 
-Lambda fuctions are so perfectly cloud resident and detached from the physical world, it's possible that you lose track of what is running in the background. As a result of mistaken invocation or some bug in the recursive code, you may end up with tens of lambda functions sucking the precious second-GBs from you free tier and later from your credit card.
+Lambda fuctions are so perfectly cloud resident and detached from the physical world, that it's possible to lose track of what is running in the background. As a result of mistaken invocation or some bug in the recursive code, you may end up with tens of lambda functions sucking the precious second-GBs from you free tier and later from your credit card.
 
 The library is preventing that using the DynamoDB. A recursive Lambda fuction is called an instance. There can be only one instance running at the same time, The accompanying DynamoDB record is keeping track of that by conditionally incrementing a singleton counter. Should a function be executed mistakenly, it will not be able to increment the record and will terminate without spinning off a recursive descendant.
 
