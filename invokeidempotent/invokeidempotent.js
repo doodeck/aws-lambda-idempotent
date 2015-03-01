@@ -9,7 +9,7 @@ var config = require('./config').config;
 var AWS = require('aws-sdk');
 AWS.config.update({region: config.region});
 // not needed, embedded in lambda execution role ... AWS.config.update({accessKeyId: 'akid', secretAccessKey: 'secret'});
-var payload = require('./modules/payload');
+var payload = require(config.payloadModule);
 
 var lambda = new AWS.Lambda({});
 var dynamodb = new AWS.DynamoDB({});

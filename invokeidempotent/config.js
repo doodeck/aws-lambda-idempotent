@@ -12,5 +12,6 @@ exports.config = {
     lambdaTimeout: 16, // default value of the handler
     acceptRange: 2, // range of accepted values in DynamoDB, in other words: retry count,
                    // should help in case Dynamo is updated but then the function freezes and the framework starts it again
-    initialExpectedSeq: 1 // initial ExpectedSeq for cases when the DynamoDB item is to be created
+    initialExpectedSeq: 1, // initial ExpectedSeq for cases when the DynamoDB item is to be created
+    payloadModule: './modules/payload'
 };
