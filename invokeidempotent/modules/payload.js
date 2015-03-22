@@ -1,16 +1,18 @@
 // payload.js
 
-exports.handler = function() {
+exports.handler = function(callback) {
   var startingMoment = +new Date();
   console.log('payload: ', new Date(startingMoment).toString());
-  var index = 0;
+  callback(undefined, { status: true, msg: "Quit happily" });
   /*
-  This is very special payload, see the project:
-  https://github.com/doodeck/life-after-life
-  to understand the consequences
-  setInterval(function() {
+  var index = 0;
+  var theInterval = setInterval(function() {
     var delta = +new Date() - startingMoment;
     console.log('index: ', index++, new Date(delta).toString());
+    if (index > 5) {
+      clearInterval(theInterval);
+      callback(undefined, { status: true, msg: "Quit happily" });
+    }
   }, (10 * 100));
   */
 }
