@@ -170,26 +170,27 @@ exports.handler = function(event, context) {
       lambdaIdempotent(params, function(err, data) {
           if (err) {
               console.log('lambdaIdempotent failed: ', err);
-          }
-
-          var contextDoneWithRestart = function(event, context) {
-            if (event.ExpectedSeq % config.restartInterval === 0)
-                forceRestart(function(err, data) {
-                  context.done(null, 'Restarted InstanceId: ' + params.InstanceId + ', ExpectedSeq: ' + params.ExpectedSeq.toString());  // SUCCESS with message
-                });
-            else
-                context.done(null, 'Exiting InstanceId: ' + params.InstanceId + ', ExpectedSeq: ' + params.ExpectedSeq.toString());  // SUCCESS with message
-          }
-
-          if (!!payload) {
-            payload.handler(function(err, data) {
-              if (err) {
-                console.log('payload.handler failed: ', err);
-              }
-              contextDoneWithRestart(event, context);
-            });
+              context.done(JSON.stringify(err), 'lambdaIdempotent failed: ' + params.InstanceId + ', ExpectedSeq: ' + params.ExpectedSeq.toString()); // ERROR!
           } else {
-            contextDoneWithRestart(event, context);
+            var contextDoneWithRestart = function(event, context) {
+              if (event.ExpectedSeq % config.restartInterval === 0)
+                  forceRestart(function(err, data) {
+                    context.done(null, 'Restarted InstanceId: ' + params.InstanceId + ', ExpectedSeq: ' + params.ExpectedSeq.toString());  // SUCCESS with message
+                  });
+              else
+                  context.done(null, 'Exiting InstanceId: ' + params.InstanceId + ', ExpectedSeq: ' + params.ExpectedSeq.toString());  // SUCCESS with message
+            }
+
+            if (!!payload) {
+              payload.handler(function(err, data) {
+                if (err) {
+                  console.log('payload.handler failed: ', err);
+                }
+                contextDoneWithRestart(event, context);
+              });
+            } else {
+              contextDoneWithRestart(event, context);
+            }
           }
 
       });
