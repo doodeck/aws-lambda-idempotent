@@ -93,6 +93,8 @@ If you want to terminate the function you can carry out any of these operations:
   <li>... or the brute force approach of deleting the Lambda function.</li>
 </ul>
 
+Note, there is a script create-function.sh, which is creating the function. However, it assumes that the necessary AWS role has already been created and must be specified on the command line.
+
 The Payload
 -----------
 You can hook any useful content in the modules/payload.js folder. Intertingly, the payload function can work after the Lambda invocation has officially finished by calling `context.done()`. You are billed only for the execution until `context.done()`, after that the payload function keeps running much longer, even 15 minutes. You can test it with the sample payload, which is an infinite loop running for as long as possible.
